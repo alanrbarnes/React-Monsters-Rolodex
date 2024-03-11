@@ -1,10 +1,77 @@
-import logo from './logo.svg';
 import './App.css';
-import { Component } from 'react';
+// import { Component } from 'react';  this is class component, dont need it anymore
 import CardList from './components/card-list/card-list.component'
 import SearchBox from './components/search-box/search-box.component'
+import { useState, useEffect } from 'react';  //useState is simplest hook available, useEffect for side effects
 
-class App extends Component {
+
+
+const App = () => {
+  const[searchField, setSearchField] = useState(''); //[value, setValue]
+  const [title, setTitle] = useState('');  //added
+
+  const [monsters, setMonsters] = useState([]);  //set new state
+  const [filteredMonsters, setFilterMonsters] = useState(monsters);
+  console.log('rendered');
+
+  //use side effects
+  //useEffect(callback_function() , [array_of_dependencies]) hook
+  //when any values in dependency array changes, run callback function
+  //using an empty array, means this should only run on first load
+  useEffect(() => {
+    //code to execute
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(response => response.json()) //console.log(response));
+    .then((users) => setMonsters(users));
+  }, []); //array most likely contains state values or prop values
+
+  useEffect(() => {
+    const newFilteredMonsters = monsters.filter((monster) => {
+      return monster.name.toLocaleLowerCase().includes(searchField);
+  });
+  setFilterMonsters(newFilteredMonsters);
+  }, [monsters, searchField]);
+
+  const onSearchChange = (event) => {
+    const searchFieldString = event.target.value.toLocaleLowerCase();  //
+    setSearchField(searchFieldString);
+  };
+
+  const onTitleChange = (event) => {   //added
+    const searchFieldString = event.target.value.toLocaleLowerCase();  //
+    setTitle(searchFieldString);
+  };
+
+
+  return (
+  <div className='App'>
+    {/* <h1 className='app-title'>Monsters Rolodex</h1> */}
+    <h1 className='app-title'>{title}</h1>
+    <SearchBox 
+            //className='search-box'
+            className='monsters-search-box'
+            onChangeHandler={onSearchChange} 
+            placeholder='search monsters'  />
+
+    <br />
+    <SearchBox   //added
+            //className='search-box'
+            className='title-search-box'
+            onChangeHandler={onTitleChange} 
+            placeholder='set title'  />
+
+            <CardList monsters={filteredMonsters} />
+  </div>
+)};
+
+
+
+
+
+
+
+
+/*class App extends Component {
 
   constructor() {
     //super needs to be called with constructor
@@ -61,15 +128,6 @@ class App extends Component {
     return ( 
         <div className="App">
           <h1 className="app-title">Monsters Rolodex</h1>
-        
-
-            {/* { filteredMonsters.map((monster) => {  //
-                return (
-                  <div key={monster.id}>
-                      <h1>{monster.name}</h1>
-                  </div>
-                );
-              })} */}
         <SearchBox 
             //className='search-box'
             className='monsters-search-box'
@@ -80,5 +138,5 @@ class App extends Component {
     );
   }
 }
-
+*/
 export default App;
